@@ -99,6 +99,9 @@ class SimpleSentryClient(object):
             'User-Agent': self.USER_AGENT,
             'Content-Type': 'application/json',
         }
+        if os.environ.get('SHELL_SENTRY_VERBOSE', '0') == '1':
+            print('Sending to shentry', file=sys.stderr)
+            print(event, file=sys.stderr)
         data = json.dumps(event).encode('utf-8')
         req = Request(self.uri, data=data, headers=headers)
         try:
@@ -119,14 +122,23 @@ def main():
     client = SimpleSentryClient.new_from_environment()
     # get the command
     try:
+        i_am_shell = False
         working_dir = tempfile.mkdtemp()
         with open(os.path.join(working_dir, 'stdout'), 'w+') as stdout:
             with open(os.path.join(working_dir, 'stderr'), 'w+') as stderr:
                 start_time = time.time()
                 command = sys.argv[1:]
+                if command[0] == '-c':
+                    i_am_shell = True
+                    command = command[1:]
                 if command[0] == '--':
                     command = command[1:]
-                p = subprocess.Popen(command, stdout=stdout, stderr=stderr, shell=False,
+                shell = os.environ.get('SHELL', '/bin/sh')
+                if i_am_shell or 'shentry' in shell:
+                    shell = '/bin/sh'
+                extra_context['shell'] = shell
+                full_command = [shell, '-c', ' '.join(command)]
+                p = subprocess.Popen(full_command, stdout=stdout, stderr=stderr, shell=False,
                                      preexec_fn=lambda: signal.signal(signal.SIGPIPE, signal.SIG_DFL))
                 end_time = time.time()
                 extra_context['start_time'] = start_time

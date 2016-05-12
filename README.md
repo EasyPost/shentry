@@ -1,7 +1,9 @@
-**Shentry** is a single-file Python script which will run the wrapped command and, if it fails, post an event to
-Sentry. By default, if the wrapped script succeeds (exists with code 0), stdout/stderr are squashed, similarly to
-[shuck](https://github.com/thwarted/shuck) or [chronic](https://joeyh.name/code/moreutils/). It also always exits
-with status 0 if events are able to be sent to Sentry.
+**Shentry** is a single-file Python script which will run the wrapped
+command and, if it fails, post an event to Sentry. By default, if the
+wrapped script succeeds (exists with code 0), stdout/stderr are squashed,
+similarly to [shuck](https://github.com/thwarted/shuck) or
+[chronic](https://joeyh.name/code/moreutils/). It also always exits with
+status 0 if events are able to be sent to Sentry.
 
 It reads its configuration from the environment variable `$SHELL_SENTRY_DSN`
 and, if such a variable is found, removes it from the environment before
@@ -9,6 +11,11 @@ calling the wrapped program. If the environment variable is not present or
 is empty, shentry will try to read a DSN from `/etc/shentry_dsn`. If no DSN
 can be found, the wrapped will have normal behavior (stdout/stderr will go
 to their normal file descriptors, exit code will be passed through, etc).
+
+This software should be compatible with Python 2.6, 2.7, 3.2, 3.3, 3.4, and
+3.5; that is to say, you should be able to run it just about anywhere.
+
+[![CircleCI](https://circleci.com/gh/EasyPost/shentry.svg?style=svg&circle-token=a7b52d03e1fa42fdf2bfa51d6b01f84f08a6a710)](https://circleci.com/gh/EasyPost/shentry)
 
 
 ## Installation

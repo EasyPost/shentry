@@ -13,8 +13,11 @@ to their normal file descriptors, exit code will be passed through, etc).
 
 ## Installation
 
-Put the file [`shentry.py`](shentry.py) anywhere in your `$PATH` under the name `shentry` and mark it as
-executable.
+Put the file [`shentry.py`](shentry.py) anywhere in your `$PATH` under the
+name `shentry` and mark it as executable.
+
+The `setup.py` in this directory only exists for `tox` to work (and run unit
+tests). Don't bother using it; just copy `shentry.py` wherever you want it.
 
 ## Usage
 

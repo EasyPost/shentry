@@ -32,6 +32,14 @@ from contextlib import closing
 VERSION = '0.1'
 
 
+def read_systemwide_config():
+    try:
+        with open('/etc/shentry_dsn', 'r') as f:
+            return f.read().strip()
+    except Exception:
+        return None
+
+
 class SimpleSentryClient(object):
     TIMEOUT = 5
     SENTRY_VERSION = 5
@@ -46,17 +54,12 @@ class SimpleSentryClient(object):
 
     @classmethod
     def new_from_environment(cls):
-        dsn = os.environ.get('SHELL_SENTRY_DSN', '')
+        dsn = os.environ.pop('SHELL_SENTRY_DSN', '')
         if not dsn:
-            try:
-                with open('/etc/shentry_dsn', 'r') as f:
-                    dsn = f.read().strip()
-            except Exception:
-                pass
+            dsn = read_systemwide_config()
         if not dsn:
             return None
         else:
-            del os.environ['SHELL_SENTRY_DSN']
             try:
                 dsn_fields = urlparse(dsn)
                 keys, netloc = dsn_fields.netloc.split('@', 1)
@@ -125,17 +128,10 @@ class SimpleSentryClient(object):
             return False
 
 
-def main():
-    extra_context = {
-        'PATH': os.environ.get('PATH', ''),
-        'username': pwd.getpwuid(os.getuid()).pw_name
-    }
-    if 'TZ' in os.environ:
-        extra_context['TZ'] = os.environ['TZ']
-    client = SimpleSentryClient.new_from_environment()
+def get_command(argv):
     # get the command
-    command = sys.argv[1:]
     i_am_shell = False
+    command = argv
     if command[0] == '-c':
         i_am_shell = True
         command = command[1:]
@@ -144,15 +140,31 @@ def main():
     shell = os.environ.get('SHELL', '/bin/sh')
     if i_am_shell or 'shentry' in shell:
         shell = '/bin/sh'
-    extra_context['shell'] = shell
     command_ws = ' '.join(command)
     full_command = [shell, '-c', command_ws]
+    return full_command, command_ws, shell
+
+
+def main(argv=None):
+    if argv is None:
+        argv = sys.argv
+    extra_context = {
+        'PATH': os.environ.get('PATH', ''),
+        'username': pwd.getpwuid(os.getuid()).pw_name
+    }
+    if 'TZ' in os.environ:
+        extra_context['TZ'] = os.environ['TZ']
+    client = SimpleSentryClient.new_from_environment()
+    full_command, command_ws, shell = get_command(argv[1:])
+    extra_context['command'] = command_ws
+    extra_context['shell'] = shell
     # if we couldn't configure sentry, just pass through
     if client is None:
         signal.signal(signal.SIGPIPE, signal.SIG_DFL)
         os.execv(shell, full_command)
         print('Unable to execv({0}, {1})'.format(shell, repr(full_command)), file=sys.stderr)
         return 1
+    working_dir = None
     try:
         working_dir = tempfile.mkdtemp()
         with open(os.path.join(working_dir, 'stdout'), 'w+') as stdout:
@@ -163,7 +175,6 @@ def main():
                 end_time = time.time()
                 extra_context['start_time'] = start_time
                 extra_context['duration'] = end_time - start_time
-                extra_context['command'] = command_ws
                 extra_context['load_average_at_exit'] = ' '.join(map(str, os.getloadavg()))
                 if p.wait() != 0:
                     stderr.seek(0, 0)
@@ -182,7 +193,8 @@ def main():
                         extra_context=extra_context,
                     )
     finally:
-        shutil.rmtree(working_dir)
+        if working_dir is not None:
+            shutil.rmtree(working_dir)
 
 
 if __name__ == '__main__':

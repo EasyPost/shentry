@@ -1,0 +1,9 @@
+build/
+dist/
+sdist/
+.cache/
+.tox/
+*.egg-info/
+test-*.xml
+venv/
+env/

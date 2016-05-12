@@ -7,11 +7,11 @@ from __future__ import print_function
 try:
     from urllib.parse import urlparse
     from urllib.request import urlopen, Request
-    from urllib.error import HTTPError
+    from urllib.error import HTTPError, URLError
 except ImportError:
     from urlparse import urlparse
     from urllib2 import urlopen, Request
-    from urllib2 import HTTPError
+    from urllib2 import HTTPError, URLError
 
 
 import datetime
@@ -29,11 +29,13 @@ import socket
 
 from contextlib import closing
 
+VERSION = '0.1'
+
 
 class SimpleSentryClient(object):
     TIMEOUT = 5
     SENTRY_VERSION = 5
-    USER_AGENT = 'shentry/0.1'
+    USER_AGENT = 'shentry/{0}'.format(VERSION)
 
     def __init__(self, dsn, uri, public, secret, project_id):
         self.dsn = dsn
@@ -107,9 +109,14 @@ class SimpleSentryClient(object):
         try:
             with closing(urlopen(req, timeout=self.TIMEOUT)) as f:
                 f.read()
+            return True
         except HTTPError as e:
             print('Error {0} sending to Sentry'.format(e.code), file=sys.stderr)
             print(e.read(), file=sys.stderr)
+            return False
+        except URLError as e:
+            print('Error {0} sending to Sentry'.format(e.reason), file=sys.stderr)
+            return False
 
 
 def main():
@@ -121,34 +128,41 @@ def main():
         extra_context['TZ'] = os.environ['TZ']
     client = SimpleSentryClient.new_from_environment()
     # get the command
+    command = sys.argv[1:]
+    i_am_shell = False
+    if command[0] == '-c':
+        i_am_shell = True
+        command = command[1:]
+    if command[0] == '--':
+        command = command[1:]
+    shell = os.environ.get('SHELL', '/bin/sh')
+    if i_am_shell or 'shentry' in shell:
+        shell = '/bin/sh'
+    extra_context['shell'] = shell
+    command_ws = ' '.join(command)
+    full_command = [shell, '-c', command_ws]
+    # if we couldn't configure sentry, just pass through
+    if client is None:
+        signal.signal(signal.SIGPIPE, signal.SIG_DFL)
+        os.execv(shell, full_command)
+        print('Unable to execv({0}, {1})'.format(shell, repr(full_command)), file=sys.stderr)
+        return 1
     try:
-        i_am_shell = False
         working_dir = tempfile.mkdtemp()
         with open(os.path.join(working_dir, 'stdout'), 'w+') as stdout:
             with open(os.path.join(working_dir, 'stderr'), 'w+') as stderr:
                 start_time = time.time()
-                command = sys.argv[1:]
-                if command[0] == '-c':
-                    i_am_shell = True
-                    command = command[1:]
-                if command[0] == '--':
-                    command = command[1:]
-                shell = os.environ.get('SHELL', '/bin/sh')
-                if i_am_shell or 'shentry' in shell:
-                    shell = '/bin/sh'
-                extra_context['shell'] = shell
-                full_command = [shell, '-c', ' '.join(command)]
                 p = subprocess.Popen(full_command, stdout=stdout, stderr=stderr, shell=False,
                                      preexec_fn=lambda: signal.signal(signal.SIGPIPE, signal.SIG_DFL))
                 end_time = time.time()
                 extra_context['start_time'] = start_time
                 extra_context['duration'] = end_time - start_time
-                extra_context['command'] = ' '.join(command)
+                extra_context['command'] = command_ws
                 extra_context['load_average_at_exit'] = ' '.join(map(str, os.getloadavg()))
                 if p.wait() != 0:
                     stderr.seek(0, 0)
                     stderr_head = stderr.read(400)
-                    message = 'Command `{0}` failed.\n'.format(' '.join(command))
+                    message = 'Command `{0}` failed.\n'.format(command_ws)
                     if stderr_head:
                         message += '\nHead of stderr:\n' + stderr_head
                     stdout.seek(0, 0)
@@ -158,7 +172,7 @@ def main():
                     client.send_event(
                         message=message,
                         level='error',
-                        fingerprint=[socket.gethostname(), ' '.join(command)],
+                        fingerprint=[socket.gethostname(), command_ws],
                         extra_context=extra_context,
                     )
     finally:

@@ -43,3 +43,7 @@ You can also make shentry your `$SHELL` and wrap all commands in it:
     7 1 * * * /usr/local/bin/run-daily-scripts
 
 In this case, it will run the wrapped commands through `/bin/sh` (otherwise, it will honor `$SHELL`).
+
+## License
+
+This software is licensed under the ISC License, the full text of which can be found at [LICENSE.txt](LICENSE.txt).

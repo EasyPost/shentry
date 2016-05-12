@@ -1,5 +1,9 @@
 dependencies:
+  cache_directories:
+    - .pyenv
   override:
+    # the others are local...
+    - pyenv install -ks 2.6.8
     - pip install tox tox-pyenv
     - pyenv local 2.6.8 2.7.10 3.2.6 3.3.3 3.4.3 3.5.0
 test:

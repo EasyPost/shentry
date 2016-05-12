@@ -48,6 +48,12 @@ class SimpleSentryClient(object):
     def new_from_environment(cls):
         dsn = os.environ.get('SHELL_SENTRY_DSN', '')
         if not dsn:
+            try:
+                with open('/etc/shentry_dsn', 'r') as f:
+                    dsn = f.read().strip()
+            except Exception:
+                pass
+        if not dsn:
             return None
         else:
             del os.environ['SHELL_SENTRY_DSN']

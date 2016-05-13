@@ -97,8 +97,11 @@ class SimpleSentryClient(object):
             'event_id': event_id,
             'timestamp': datetime.datetime.utcnow().isoformat().split('.', 1)[0],
             'message': message,
-            'server_name': socket.gethostname(),
-            'logger': logger,
+            'tags': [
+                ['server_name', socket.gethostname()],
+                ['logger', logger],
+                ['level', level],
+            ],
             'fingerprint': fingerprint,
             'platform': 'other',
             'device': {

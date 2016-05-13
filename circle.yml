@@ -1,6 +1,7 @@
 dependencies:
   cache_directories:
     - .pyenv
+    - /opt/circleci/.pyenv/versions/2.6.8
   override:
     # the others are local...
     - pyenv install -ks 2.6.8

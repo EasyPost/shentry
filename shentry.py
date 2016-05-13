@@ -157,9 +157,19 @@ def get_command(argv):
     return full_command, command_ws, shell
 
 
+def show_usage():
+    print('Usage: shentry [-c] command [...]', file=sys.stderr)
+    print('', file=sys.stderr)
+    print('Runs COMMAND, sending the output to Sentry if it exits non-0', file=sys.stderr)
+    print('Takes sentry DSN from $SHELL_SENTRY_DSN or /etc/shentry_dsn', file=sys.stderr)
+
+
 def main(argv=None):
     if argv is None:
         argv = sys.argv
+    if len(argv) < 2:
+        show_usage()
+        return 2
     extra_context = {
         'PATH': os.environ.get('PATH', ''),
         'username': pwd.getpwuid(os.getuid()).pw_name

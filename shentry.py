@@ -167,6 +167,25 @@ def show_usage():
     print('Takes sentry DSN from $SHELL_SENTRY_DSN or /etc/shentry_dsn', file=sys.stderr)
 
 
+def read_snippet(fo, max_length):
+    fo.seek(0, os.SEEK_END)
+    length = fo.tell()
+    rv = []
+    fo.seek(0, os.SEEK_SET)
+    read_all = False
+    if length > max_length:
+        top = int(max_length / 2) - 8
+        bottom = max_length - top
+        rv.append(fo.read(top))
+        rv.append('\n[snip]\n')
+        fo.seek(-1 * bottom, os.SEEK_END)
+        rv.append(fo.read(bottom))
+    else:
+        rv.append(fo.read())
+        read_all = True
+    return ''.join(rv), read_all
+
+
 def main(argv=None):
     if argv is None:
         argv = sys.argv
@@ -202,15 +221,21 @@ def main(argv=None):
                 extra_context['duration'] = end_time - start_time
                 extra_context['load_average_at_exit'] = ' '.join(map(str, os.getloadavg()))
                 if p.wait() != 0:
-                    stderr.seek(0, 0)
-                    stderr_head = stderr.read(400)
+                    stderr_head, stderr_is_all = read_snippet(stderr, 700)
                     message = 'Command `{0}` failed.\n'.format(command_ws)
                     if stderr_head:
-                        message += '\nHead of stderr:\n' + stderr_head
-                    stdout.seek(0, 0)
-                    stdout_head = stdout.read(400)
+                        if stderr_is_all:
+                            message += '\nstderr:\n'
+                        else:
+                            message += '\nExcerpt of stderr:\n'
+                        message += stderr_head
+                    stdout_head, stdout_is_all = read_snippet(stdout, 200 + (700 - len(stderr_head)))
                     if stdout_head:
-                        message += '\nHead of stdout:\n' + stdout_head
+                        if stdout_is_all:
+                            message += '\nstdout:\n'
+                        else:
+                            message += '\nExcerpt of stdout:\n'
+                        message += stdout_head
                     client.send_event(
                         message=message,
                         level='error',

@@ -221,8 +221,10 @@ def main(argv=None):
                 extra_context['duration'] = end_time - start_time
                 extra_context['load_average_at_exit'] = ' '.join(map(str, os.getloadavg()))
                 if p.wait() != 0:
+                    code = p.returncode
+                    extra_context['returncode'] = code
                     stderr_head, stderr_is_all = read_snippet(stderr, 700)
-                    message = 'Command `{0}` failed.\n'.format(command_ws)
+                    message = 'Command `{0}` failed with code {1}.\n'.format(command_ws, code)
                     if stderr_head:
                         if stderr_is_all:
                             message += '\nstderr:\n'

@@ -59,10 +59,11 @@ def test_main(mocker, tmpdir):
     mock_popen = mock.Mock(autospec=subprocess.Popen)
     mocker.patch('subprocess.Popen', return_value=mock_popen)
     mock_popen.wait.return_value = 1
+    mock_popen.returncode = 1
     shentry.main(['shentry', '/bin/ls'])
     tempfile.mkdtemp.assert_called_once_with()
     mock_client.send_event.assert_called_once_with(
-        message='Command `/bin/ls` failed.\n',
+        message='Command `/bin/ls` failed with code 1.\n',
         level='error',
         fingerprint=[socket.gethostname(), '/bin/ls'],
         extra_context={
@@ -72,6 +73,7 @@ def test_main(mocker, tmpdir):
             'start_time': ANY,
             'command': '/bin/ls',
             'duration': ANY,
-            'PATH': 'A_PATH'
+            'PATH': 'A_PATH',
+            'returncode': 1,
         }
     )

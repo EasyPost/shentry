@@ -216,11 +216,11 @@ def main(argv=None):
                 start_time = time.time()
                 p = subprocess.Popen(full_command, stdout=stdout, stderr=stderr, shell=False,
                                      preexec_fn=lambda: signal.signal(signal.SIGPIPE, signal.SIG_DFL))
-                end_time = time.time()
                 extra_context['start_time'] = start_time
-                extra_context['duration'] = end_time - start_time
                 extra_context['load_average_at_exit'] = ' '.join(map(str, os.getloadavg()))
                 if p.wait() != 0:
+                    end_time = time.time()
+                    extra_context['duration'] = end_time - start_time
                     code = p.returncode
                     extra_context['returncode'] = code
                     stderr_head, stderr_is_all = read_snippet(stderr, 700)

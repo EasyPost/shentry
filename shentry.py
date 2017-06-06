@@ -12,7 +12,7 @@
 # PERFORMANCE OF THIS SOFTWARE.
 
 
-# NOTE: This code should work with Python 2.6, 2.7, 3.2, 3.3, 3.4, and 3.5
+# NOTE: This code should work with Python 2.6, 2.7, 3.2, 3.3, 3.4, 3.5, and 3.6
 
 from __future__ import print_function
 
@@ -24,6 +24,12 @@ except ImportError:
     from urlparse import urlparse
     from urllib2 import urlopen, Request
     from urllib2 import HTTPError, URLError
+
+try:
+    import requests
+    has_requests = True
+except ImportError:
+    has_requests = False
 
 
 import datetime
@@ -41,7 +47,7 @@ import socket
 
 from contextlib import closing
 
-VERSION = '0.2.1'
+VERSION = '0.3.0'
 
 
 def read_systemwide_config():
@@ -50,6 +56,58 @@ def read_systemwide_config():
             return f.read().strip()
     except Exception:
         return None
+
+
+def _get_proxy_url():
+    if 'SHELL_SENTRY_PROXY' in os.environ:
+        return os.environ['SHELL_SENTRY_PROXY']
+    try:
+        with open('/etc/shentry_dsn', 'r') as f:
+            return f.read().strip()
+    except Exception:
+        pass
+    return None
+
+
+def _send_urllib2(uri, headers, data, timeout):
+    req = Request(uri, data=data, headers=headers)
+    try:
+        with closing(urlopen(req, timeout=timeout)) as f:
+            f.read()
+        return True
+    except HTTPError as e:
+        print('Error {0} sending to Sentry'.format(e.code), file=sys.stderr)
+        print(e.read(), file=sys.stderr)
+        return False
+    except URLError as e:
+        print('Error {0} sending to Sentry'.format(e.reason), file=sys.stderr)
+        return False
+
+
+def _send_requests(uri, headers, data, timeout):
+    try:
+        kwargs = {}
+        proxy_url = _get_proxy_url()
+        if proxy_url is not None:
+            kwargs['proxies'] = {
+                'http': proxy_url,
+                'https': proxy_url
+            }
+        resp = requests.post(
+            uri, headers=headers, data=data, timeout=timeout,
+            **kwargs
+        )
+        resp.raise_for_status()
+        return True
+    except requests.exceptions.RequestException as e:
+        print('Error {0!r} sending to Sentry'.format(e), file=sys.stderr)
+        return False
+
+
+if has_requests:
+    send_to_sentry = _send_requests
+else:
+    send_to_sentry = _send_urllib2
 
 
 class SimpleSentryClient(object):
@@ -129,18 +187,7 @@ class SimpleSentryClient(object):
             print('Sending to shentry', file=sys.stderr)
             print(event, file=sys.stderr)
         data = json.dumps(event).encode('utf-8')
-        req = Request(self.uri, data=data, headers=headers)
-        try:
-            with closing(urlopen(req, timeout=self.TIMEOUT)) as f:
-                f.read()
-            return True
-        except HTTPError as e:
-            print('Error {0} sending to Sentry'.format(e.code), file=sys.stderr)
-            print(e.read(), file=sys.stderr)
-            return False
-        except URLError as e:
-            print('Error {0} sending to Sentry'.format(e.reason), file=sys.stderr)
-            return False
+        return send_to_sentry(uri=self.uri, headers=headers, data=data, timeout=self.TIMEOUT)
 
 
 def get_command(argv):
@@ -218,6 +265,7 @@ def main(argv=None):
                                      preexec_fn=lambda: signal.signal(signal.SIGPIPE, signal.SIG_DFL))
                 extra_context['start_time'] = start_time
                 extra_context['load_average_at_exit'] = ' '.join(map(str, os.getloadavg()))
+                extra_context['_sent_with'] = send_to_sentry.__name__
                 if p.wait() != 0:
                     end_time = time.time()
                     extra_context['duration'] = end_time - start_time

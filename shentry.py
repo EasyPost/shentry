@@ -62,7 +62,7 @@ def _get_proxy_url():
     if 'SHELL_SENTRY_PROXY' in os.environ:
         return os.environ['SHELL_SENTRY_PROXY']
     try:
-        with open('/etc/shentry_dsn', 'r') as f:
+        with open('/etc/shentry_proxy', 'r') as f:
             return f.read().strip()
     except Exception:
         pass

@@ -13,7 +13,6 @@ try:
     from BaseHTTPServer import HTTPServer
     from BaseHTTPServer import BaseHTTPRequestHandler
 except ImportError:
-    raise
     from http.server import HTTPServer
     from http.server import BaseHTTPRequestHandler
 

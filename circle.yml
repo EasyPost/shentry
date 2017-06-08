@@ -3,6 +3,8 @@ dependencies:
     - .pyenv
     - /opt/circleci/.pyenv/versions/2.6.8
   override:
+    - sudo apt-get update
+    - sudo apt-get install --yes wamerican-small
     # the others are local...
     - pyenv install -ks 2.6.8
     - pip install tox tox-pyenv

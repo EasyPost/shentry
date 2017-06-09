@@ -46,7 +46,7 @@ class SentryHTTPRequestHandler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
 
-class TestHTTPServer(object):
+class UUTHTTPServer(object):
     def __init__(self):
         self.running = False
         self.address = None
@@ -84,7 +84,7 @@ class TestHTTPServer(object):
 
 @pytest.yield_fixture
 def http_server():
-    t_s = TestHTTPServer()
+    t_s = UUTHTTPServer()
     t_s.start()
     yield t_s
     t_s.stop()

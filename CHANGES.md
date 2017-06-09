@@ -1,3 +1,8 @@
+0.3.1
+-----
+- Fix bug with loading large command outputs
+- Add more tests
+
 0.3.0
 -----
 - Add support for using `requests` if it's importable

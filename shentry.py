@@ -223,12 +223,15 @@ def read_snippet(fo, max_length):
     if length > max_length:
         top = int(max_length / 2) - 8
         bottom = max_length - top
-        rv.append(fo.read(top))
+        top = fo.read(top).decode('utf-8', 'ignore')
+        rv.append(top)
+        if not top.endswith('\n'):
+            rv.append('\n')
         rv.append('\n[snip]\n')
         fo.seek(-1 * bottom, os.SEEK_END)
-        rv.append(fo.read(bottom))
+        rv.append(fo.read(bottom).decode('utf-8', 'ignore'))
     else:
-        rv.append(fo.read())
+        rv.append(fo.read().decode('utf-8', 'ignore'))
         read_all = True
     return ''.join(rv), read_all
 
@@ -258,8 +261,8 @@ def main(argv=None):
     working_dir = None
     try:
         working_dir = tempfile.mkdtemp()
-        with open(os.path.join(working_dir, 'stdout'), 'w+') as stdout:
-            with open(os.path.join(working_dir, 'stderr'), 'w+') as stderr:
+        with open(os.path.join(working_dir, 'stdout'), 'w+b') as stdout:
+            with open(os.path.join(working_dir, 'stderr'), 'w+b') as stderr:
                 start_time = time.time()
                 p = subprocess.Popen(full_command, stdout=stdout, stderr=stderr, shell=False,
                                      preexec_fn=lambda: signal.signal(signal.SIGPIPE, signal.SIG_DFL))

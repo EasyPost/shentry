@@ -75,6 +75,7 @@ def test_main(mocker, tmpdir):
             'duration': ANY,
             'PATH': 'A_PATH',
             'returncode': 1,
+            'working_directory': ANY,
             '_sent_with': ANY,
         }
     )

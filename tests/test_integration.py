@@ -140,16 +140,19 @@ def test_no_output(http_server, scripts):
             'returncode': 1,
             'shell': '/bin/sh',
             'start_time': mock.ANY,
-            'username': pwd.getpwuid(os.getuid()).pw_name
+            'username': pwd.getpwuid(os.getuid()).pw_name,
+            'working_directory': mock.ANY,
         },
         'fingerprint': mock.ANY,
         'message': 'Command `{0}` failed with code 1.\n'.format(scripts['FAIL_NO_OUTPUT']),
         'platform': 'other',
-        'tags': [
-            ['server_name', socket.gethostname()],
-            ['logger', ''],
-            ['level', 'error']
-        ],
+        'server_name': socket.gethostname(),
+        'level': 'error',
+        'tags': [],
+        'sdk': {
+            'name': 'shentry',
+            'version': mock.ANY,
+        },
         'timestamp': mock.ANY,
     }
 
@@ -179,16 +182,19 @@ def test_multi_kb_output(http_server, scripts):
             'returncode': 1,
             'shell': '/bin/sh',
             'start_time': mock.ANY,
-            'username': pwd.getpwuid(os.getuid()).pw_name
+            'username': pwd.getpwuid(os.getuid()).pw_name,
+            'working_directory': mock.ANY,
         },
         'fingerprint': mock.ANY,
         'message': mock.ANY,
         'platform': 'other',
-        'tags': [
-            ['server_name', socket.gethostname()],
-            ['logger', ''],
-            ['level', 'error']
-        ],
+        'server_name': socket.gethostname(),
+        'level': 'error',
+        'tags': [],
+        'sdk': {
+            'name': 'shentry',
+            'version': mock.ANY,
+        },
         'timestamp': mock.ANY,
     }
     assert body['message'].startswith(

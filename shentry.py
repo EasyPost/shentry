@@ -155,11 +155,13 @@ class SimpleSentryClient(object):
             'event_id': event_id,
             'timestamp': datetime.datetime.utcnow().isoformat().split('.', 1)[0],
             'message': message,
-            'tags': [
-                ['server_name', socket.gethostname()],
-                ['logger', logger],
-                ['level', level],
-            ],
+            'level': level,
+            'server_name': socket.gethostname(),
+            'tags': [],
+            'sdk': {
+                'name': 'shentry',
+                'version': VERSION,
+            },
             'fingerprint': fingerprint,
             'platform': 'other',
             'device': {
@@ -169,6 +171,8 @@ class SimpleSentryClient(object):
             },
             'extra': {}
         }
+        if logger:
+            event['logger'] = logger
         if culprit is not None:
             event['culprit'] = culprit
         event['extra'].update(extra_context)
@@ -268,6 +272,7 @@ def main(argv=None):
                                      preexec_fn=lambda: signal.signal(signal.SIGPIPE, signal.SIG_DFL))
                 extra_context['start_time'] = start_time
                 extra_context['load_average_at_exit'] = ' '.join(map(str, os.getloadavg()))
+                extra_context['working_directory'] = os.getcwd()
                 extra_context['_sent_with'] = send_to_sentry.__name__
                 if p.wait() != 0:
                     end_time = time.time()

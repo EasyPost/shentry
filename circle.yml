@@ -8,7 +8,7 @@ dependencies:
     # the others are local...
     - pyenv install -ks 2.6.8
     - pip install tox tox-pyenv
-    - pyenv local 2.6.8 2.7.11 3.2.6 3.3.6 3.4.4 3.5.1
+    - pyenv local 2.6.8 2.7.11 3.2.6 3.3.6 3.4.4 3.5.3 3.6.1
 test:
   override:
     - tox

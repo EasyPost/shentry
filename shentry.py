@@ -47,7 +47,7 @@ import socket
 
 from contextlib import closing
 
-VERSION = '0.3.1'
+VERSION = '0.3.2'
 
 
 def read_systemwide_config():

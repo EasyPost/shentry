@@ -5,7 +5,7 @@ from setuptools import setup
 
 setup(
     name="shentry",
-    version="0.3.1",
+    version="0.3.2",
     author="EasyPost",
     author_email="oss@easypost.com",
     url="https://github.com/easypost/shentry",

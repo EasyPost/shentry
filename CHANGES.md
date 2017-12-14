@@ -1,3 +1,8 @@
+0.3.2
+-----
+- Move `level`, `server_name` and `sdk` from `tags` to top-level
+- Add Python 3.6 to tox tests
+
 0.3.1
 -----
 - Fix bug with loading large command outputs

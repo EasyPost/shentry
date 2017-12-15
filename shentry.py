@@ -157,7 +157,6 @@ class SimpleSentryClient(object):
             'message': message,
             'level': level,
             'server_name': socket.gethostname(),
-            'tags': [],
             'sdk': {
                 'name': 'shentry',
                 'version': VERSION,

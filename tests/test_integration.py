@@ -148,7 +148,6 @@ def test_no_output(http_server, scripts):
         'platform': 'other',
         'server_name': socket.gethostname(),
         'level': 'error',
-        'tags': [],
         'sdk': {
             'name': 'shentry',
             'version': mock.ANY,
@@ -190,7 +189,6 @@ def test_multi_kb_output(http_server, scripts):
         'platform': 'other',
         'server_name': socket.gethostname(),
         'level': 'error',
-        'tags': [],
         'sdk': {
             'name': 'shentry',
             'version': mock.ANY,

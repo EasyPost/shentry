@@ -318,6 +318,10 @@ def main(argv=None):
                     )
     finally:
         if working_dir is not None:
+            with open(os.path.join(working_dir, 'stdout'), 'r') as st_file:
+                print(''.join(st_file.readlines()), file=sys.stdout)
+            with open(os.path.join(working_dir, 'stderr'), 'r') as ste_file:
+                print(''.join(ste_file.readlines()), file=sys.stderr)
             shutil.rmtree(working_dir)
 
 

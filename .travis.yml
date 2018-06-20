@@ -12,5 +12,5 @@ install:
   - "pip install -r requirements-tests.txt"
   - "pip install ."
 script: 
-  - "pytest --cov=shentry --cov-report=term-missing tests/"
+  - "py.test --cov-fail-under=50 --cov=shentry --cov-report=term-missing tests/"
   - "flake8 shentry.py"

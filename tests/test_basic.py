@@ -55,7 +55,7 @@ def test_main(mocker, tmpdir):
     mock_client = mock.Mock(autospec=shentry.SimpleSentryClient)
     mocker.patch('shentry.SimpleSentryClient.new_from_environment', return_value=mock_client)
     mocker.patch('tempfile.mkdtemp', return_value=str(tmpdir))
-    mocker.patch.dict('os.environ', {'SHELL': '/bin/fish', 'PATH': 'A_PATH'})
+    mocker.patch.dict('os.environ', {'SHELL': '/bin/fish', 'PATH': 'A_PATH', 'TZ': 'UTC'})
     mock_popen = mock.Mock(autospec=subprocess.Popen)
     mocker.patch('subprocess.Popen', return_value=mock_popen)
     mock_popen.wait.return_value = 1
@@ -74,6 +74,7 @@ def test_main(mocker, tmpdir):
             'command': '/bin/ls',
             'duration': ANY,
             'PATH': 'A_PATH',
+            'TZ': 'UTC',
             'returncode': 1,
             'working_directory': ANY,
             '_sent_with': ANY,

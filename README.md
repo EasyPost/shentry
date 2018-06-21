@@ -15,7 +15,7 @@ to their normal file descriptors, exit code will be passed through, etc).
 This software should be compatible with Python 2.6, 2.7, 3.3, 3.4, 3.5, and
 3.6; that is to say, you should be able to run it just about anywhere.
 
-[![CircleCI](https://circleci.com/gh/EasyPost/shentry.svg?style=svg&circle-token=a7b52d03e1fa42fdf2bfa51d6b01f84f08a6a710)](https://circleci.com/gh/EasyPost/shentry)
+[![Build Status](https://travis-ci.org/EasyPost/shentry.svg?branch=master)](https://travis-ci.org/EasyPost/shentry)
 
 
 ## Installation

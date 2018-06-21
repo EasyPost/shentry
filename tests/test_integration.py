@@ -119,7 +119,8 @@ def test_no_output(http_server, scripts):
     subprocess.check_call(
         ['shentry.py', scripts['FAIL_NO_OUTPUT']],
         env={
-            'SHELL_SENTRY_DSN': http_server.uri
+            'SHELL_SENTRY_DSN': http_server.uri,
+            'TZ': 'UTC',
         }
     )
     # ensure that the http server has processed all requests
@@ -133,6 +134,7 @@ def test_no_output(http_server, scripts):
         'event_id': mock.ANY,
         'extra': {
             'PATH': mock.ANY,
+            'TZ': 'UTC',
             '_sent_with': mock.ANY,
             'command': scripts['FAIL_NO_OUTPUT'],
             'duration': mock.ANY,
@@ -160,7 +162,8 @@ def test_multi_kb_output(http_server, scripts):
     subprocess.check_call(
         ['shentry.py', scripts['FAIL_LONG_OUTPUT']],
         env={
-            'SHELL_SENTRY_DSN': http_server.uri
+            'SHELL_SENTRY_DSN': http_server.uri,
+            'TZ': 'UTC',
         }
     )
     # ensure that the http server has processed all requests
@@ -174,6 +177,7 @@ def test_multi_kb_output(http_server, scripts):
         'event_id': mock.ANY,
         'extra': {
             'PATH': mock.ANY,
+            'TZ': 'UTC',
             '_sent_with': mock.ANY,
             'command': scripts['FAIL_LONG_OUTPUT'],
             'duration': mock.ANY,

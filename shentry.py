@@ -262,13 +262,28 @@ def main(argv=None):
         print('Unable to execv({0}, {1})'.format(shell, repr(full_command)), file=sys.stderr)
         return 1
     working_dir = None
+
+    p = None
+
+    def passthrough(signum, frame):
+        if p is not None:
+            p.send_signal(signum)
+        else:
+            raise ValueError('received signal %d without a child; bailing' % signum)
+
+    def reset_signals():
+        for sig in (signal.SIGTERM, signal.SIGQUIT, signal.SIGINT, signal.SIGPIPE):
+            signal.signal(sig, signal.SIG_DFL)
+
+    for sig in (signal.SIGTERM, signal.SIGQUIT, signal.SIGINT):
+        signal.signal(sig, passthrough)
     try:
         working_dir = tempfile.mkdtemp()
         with open(os.path.join(working_dir, 'stdout'), 'w+b') as stdout:
             with open(os.path.join(working_dir, 'stderr'), 'w+b') as stderr:
                 start_time = time.time()
                 p = subprocess.Popen(full_command, stdout=stdout, stderr=stderr, shell=False,
-                                     preexec_fn=lambda: signal.signal(signal.SIGPIPE, signal.SIG_DFL))
+                                     preexec_fn=reset_signals)
                 extra_context['start_time'] = start_time
                 extra_context['load_average_at_exit'] = ' '.join(map(str, os.getloadavg()))
                 extra_context['working_directory'] = os.getcwd()

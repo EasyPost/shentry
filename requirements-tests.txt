@@ -1,0 +1,6 @@
+# pytest can't go above 3.2 because we need python 2.6 compat
+pytest==3.2.*
+pytest-cov==2.*
+mock==2.0.0
+pytest-mock==1.*
+flake8==3.*

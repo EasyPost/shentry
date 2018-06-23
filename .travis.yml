@@ -11,6 +11,6 @@ install:
   - "pip install ."
 script: 
   - "py.test --cov-fail-under=50 --cov=shentry --cov-report=term-missing tests/"
-  - "if python -c 'import sys; exit(1 if sys.version_info < (2, 7) else 0)' ; then flake8 shentry.py ; else echo 'flake8 is broken on py26'; fi
+  - "if python -c 'import sys; exit(1 if sys.version_info < (2, 7) else 0)' ; then flake8 shentry.py ; else echo 'flake8 is broken on py26'; fi"
 env:
   - TZ=UTC

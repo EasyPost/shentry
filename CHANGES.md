@@ -1,3 +1,9 @@
+0.4.0
+-----
+- pass through SIGTERM, SIGQUIT, and SIGINT to the child process
+- do not send empty tags to Sentry
+- (internal) switch tests from circleci to travisci
+
 0.3.2
 -----
 - Move `level`, `server_name` and `sdk` from `tags` to top-level

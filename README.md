@@ -12,10 +12,10 @@ is empty, shentry will try to read a DSN from `/etc/shentry_dsn`. If no DSN
 can be found, the wrapped will have normal behavior (stdout/stderr will go
 to their normal file descriptors, exit code will be passed through, etc).
 
-This software should be compatible with Python 2.6, 2.7, 3.3, 3.4, 3.5, and
-3.6; that is to say, you should be able to run it just about anywhere.
+This software should be compatible with Python 2.6, 2.7, and 3.5+;
+that is to say, you should be able to run it just about anywhere.
 
-[![Build Status](https://travis-ci.org/EasyPost/shentry.svg?branch=master)](https://travis-ci.org/EasyPost/shentry)
+[![Build Status](https://travis-ci.com/EasyPost/shentry.svg?branch=master)](https://travis-ci.com/EasyPost/shentry)
 
 
 ## Installation

@@ -7,8 +7,9 @@ status 0 if events are able to be sent to Sentry.
 
 It reads its configuration from the environment variable `$SHELL_SENTRY_DSN`
 and, if such a variable is found, removes it from the environment before
-calling the wrapped program. If the environment variable is not present or
-is empty, shentry will try to read a DSN from `/etc/shentry_dsn`. If no DSN
+calling the wrapped program. If that environment variable is not present, shentry will look
+for `$SENTRY_DSN`. If neither of the environment variables are present or btoh
+are empty, shentry will try to read a DSN from `/etc/shentry_dsn`. If no DSN
 can be found, the wrapped will have normal behavior (stdout/stderr will go
 to their normal file descriptors, exit code will be passed through, etc).
 

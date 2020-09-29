@@ -126,6 +126,8 @@ class SimpleSentryClient(object):
     def new_from_environment(cls):
         dsn = os.environ.pop('SHELL_SENTRY_DSN', '')
         if not dsn:
+            dsn = os.environ.pop('SENTRY_DSN', '')
+        if not dsn:
             dsn = read_systemwide_config()
         if not dsn:
             return None
@@ -214,7 +216,7 @@ def show_usage():
     print('Usage: shentry [-c] command [...]', file=sys.stderr)
     print('', file=sys.stderr)
     print('Runs COMMAND, sending the output to Sentry if it exits non-0', file=sys.stderr)
-    print('Takes sentry DSN from $SHELL_SENTRY_DSN or /etc/shentry_dsn', file=sys.stderr)
+    print('Takes sentry DSN from $SHELL_SENTRY_DSN, $SENTRY_DSN, or /etc/shentry_dsn', file=sys.stderr)
 
 
 def read_snippet(fo, max_length):

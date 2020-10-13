@@ -41,6 +41,14 @@ class TestSimpleSentryClient(object):
         assert client.secret == 'priv'
         assert client.project_id == '1'
 
+    def test_new_from_environment_regular_dsn(self, mocker):
+        mocker.patch.dict('os.environ', {'SENTRY_DSN': 'https://pub:priv@sentry.test/3'})
+        client = shentry.SimpleSentryClient.new_from_environment()
+        assert client.uri == 'https://sentry.test/api/3/store/'
+        assert client.public == 'pub'
+        assert client.secret == 'priv'
+        assert client.project_id == '3'
+
     def test_new_from_environment_with_file(self, mocker):
         mocker.patch.dict('os.environ', {'SHELL_SENTRY_DSN': ''})
         mocker.patch.object(shentry, 'read_systemwide_config', return_value='https://pub:priv@sentry.test/2')

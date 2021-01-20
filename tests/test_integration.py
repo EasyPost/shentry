@@ -6,6 +6,7 @@ import json
 import mock
 import pwd
 import socket
+import sys
 
 import pytest
 
@@ -117,7 +118,7 @@ def scripts(tmpdir):
 
 def test_no_output(http_server, scripts):
     subprocess.check_call(
-        ['shentry.py', scripts['FAIL_NO_OUTPUT']],
+        [sys.executable, 'shentry.py', scripts['FAIL_NO_OUTPUT']],
         env={
             'SHELL_SENTRY_DSN': http_server.uri,
             'TZ': 'UTC',
@@ -160,7 +161,7 @@ def test_no_output(http_server, scripts):
 
 def test_multi_kb_output(http_server, scripts):
     subprocess.check_call(
-        ['shentry.py', scripts['FAIL_LONG_OUTPUT']],
+        [sys.executable, 'shentry.py', scripts['FAIL_LONG_OUTPUT']],
         env={
             'SHELL_SENTRY_DSN': http_server.uri,
             'TZ': 'UTC',

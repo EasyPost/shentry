@@ -7,3 +7,4 @@ sdist/
 test-*.xml
 venv/
 env/
+.coverage

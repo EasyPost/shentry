@@ -6,6 +6,7 @@ import json
 import mock
 import pwd
 import socket
+import sys
 
 import pytest
 
@@ -97,8 +98,10 @@ exit 1
 
 FAIL_LONG_OUTPUT = '''#!/bin/bash
 
-head -c 2000 /usr/share/dict/words
-tail -c 2000 /usr/share/dict/words >&2
+for i in $(seq 1 4000)
+do
+    echo >&2 "line ${i}"
+done
 
 exit 1
 '''
@@ -117,7 +120,7 @@ def scripts(tmpdir):
 
 def test_no_output(http_server, scripts):
     subprocess.check_call(
-        ['shentry.py', scripts['FAIL_NO_OUTPUT']],
+        [sys.executable, 'shentry.py', scripts['FAIL_NO_OUTPUT']],
         env={
             'SHELL_SENTRY_DSN': http_server.uri,
             'TZ': 'UTC',
@@ -160,7 +163,7 @@ def test_no_output(http_server, scripts):
 
 def test_multi_kb_output(http_server, scripts):
     subprocess.check_call(
-        ['shentry.py', scripts['FAIL_LONG_OUTPUT']],
+        [sys.executable, 'shentry.py', scripts['FAIL_LONG_OUTPUT']],
         env={
             'SHELL_SENTRY_DSN': http_server.uri,
             'TZ': 'UTC',
@@ -199,6 +202,5 @@ def test_multi_kb_output(http_server, scripts):
         },
         'timestamp': mock.ANY,
     }
-    assert body['message'].startswith(
-        'Command `{0}` failed with code 1.\n\nExcerpt of stderr:\n'.format(scripts['FAIL_LONG_OUTPUT'])
-    )
+    expected = 'Command `{0}` failed with code 1.\n\nExcerpt of stderr:\n'.format(scripts['FAIL_LONG_OUTPUT'])
+    assert body['message'].startswith(expected)

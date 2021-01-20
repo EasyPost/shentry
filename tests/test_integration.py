@@ -98,8 +98,10 @@ exit 1
 
 FAIL_LONG_OUTPUT = '''#!/bin/bash
 
-head -c 2000 /usr/share/dict/words
-tail -c 2000 /usr/share/dict/words >&2
+for i in $(seq 1 4000)
+do
+    echo >&2 "line ${i}"
+done
 
 exit 1
 '''
@@ -200,6 +202,5 @@ def test_multi_kb_output(http_server, scripts):
         },
         'timestamp': mock.ANY,
     }
-    assert body['message'].startswith(
-        'Command `{0}` failed with code 1.\n\nExcerpt of stderr:\n'.format(scripts['FAIL_LONG_OUTPUT'])
-    )
+    expected = 'Command `{0}` failed with code 1.\n\nExcerpt of stderr:\n'.format(scripts['FAIL_LONG_OUTPUT'])
+    assert body['message'].startswith(expected)

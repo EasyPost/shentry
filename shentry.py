@@ -126,7 +126,7 @@ class SimpleSentryClient(object):
     def new_from_environment(cls):
         dsn = os.environ.pop('SHELL_SENTRY_DSN', '')
         if not dsn:
-            dsn = os.environ.pop('SENTRY_DSN', '')
+            dsn = os.environ.get('SENTRY_DSN', '')
         if not dsn:
             dsn = read_systemwide_config()
         if not dsn:

@@ -1,3 +1,7 @@
+0.4.1
+-----
+- Don't pop `$SENTRY_DSN` from the environment when we use it
+
 0.4.0
 -----
 - pass through SIGTERM, SIGQUIT, and SIGINT to the child process

@@ -10,6 +10,9 @@ and, if such a variable is found, removes it from the environment before
 calling the wrapped program. If that environment variable is not present, shentry will look
 for `$SENTRY_DSN` (and similarly remove it from the environment).
 If you need to use SENTRY_DSN inside your project code, make sure to set both.
+You may also in that case want to put a top-level try/except around your whole
+program to prevent uncaught exceptions from trigging both your in-process sentry sdk
+and also your extra-process shentry, since you very likely only want one or the other.
 If neither of the environment variables are present or both
 are empty, shentry will try to read a DSN from `/etc/shentry_dsn`. If no DSN
 can be found, the wrapped will have normal behavior (stdout/stderr will go

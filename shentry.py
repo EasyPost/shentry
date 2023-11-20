@@ -11,22 +11,19 @@
 # AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 # PERFORMANCE OF THIS SOFTWARE.
 
-
-# NOTE: This code should work with Python 2.6, 2.7, 3.2, 3.3, 3.4, 3.5, and 3.6
-
 from __future__ import print_function
 
 try:
-    from urllib.parse import urlparse
-    from urllib.request import urlopen, Request
     from urllib.error import HTTPError, URLError
+    from urllib.parse import urlparse
+    from urllib.request import Request, urlopen
 except ImportError:
+    from urllib2 import HTTPError, Request, URLError, urlopen
     from urlparse import urlparse
-    from urllib2 import urlopen, Request
-    from urllib2 import HTTPError, URLError
 
 try:
     import requests
+
     has_requests = True
 except ImportError:
     has_requests = False
@@ -36,33 +33,32 @@ import datetime
 import json
 import os
 import pwd
-import sys
-import time
-import uuid
-import subprocess
-import tempfile
 import shutil
 import signal
 import socket
-
+import subprocess
+import sys
+import tempfile
+import time
+import uuid
 from contextlib import closing
 
-VERSION = '0.4.0'
+VERSION = "1.0.0"
 
 
 def read_systemwide_config():
     try:
-        with open('/etc/shentry_dsn', 'r') as f:
+        with open("/etc/shentry_dsn", "r") as f:
             return f.read().strip()
     except Exception:
         return None
 
 
 def _get_proxy_url():
-    if 'SHELL_SENTRY_PROXY' in os.environ:
-        return os.environ['SHELL_SENTRY_PROXY']
+    if "SHELL_SENTRY_PROXY" in os.environ:
+        return os.environ["SHELL_SENTRY_PROXY"]
     try:
-        with open('/etc/shentry_proxy', 'r') as f:
+        with open("/etc/shentry_proxy", "r") as f:
             return f.read().strip()
     except Exception:
         pass
@@ -76,11 +72,11 @@ def _send_urllib2(uri, headers, data, timeout):
             f.read()
         return True
     except HTTPError as e:
-        print('Error {0} sending to Sentry'.format(e.code), file=sys.stderr)
+        print("Error {0} sending to Sentry".format(e.code), file=sys.stderr)
         print(e.read(), file=sys.stderr)
         return False
     except URLError as e:
-        print('Error {0} sending to Sentry'.format(e.reason), file=sys.stderr)
+        print("Error {0} sending to Sentry".format(e.reason), file=sys.stderr)
         return False
 
 
@@ -89,18 +85,12 @@ def _send_requests(uri, headers, data, timeout):
         kwargs = {}
         proxy_url = _get_proxy_url()
         if proxy_url is not None:
-            kwargs['proxies'] = {
-                'http': proxy_url,
-                'https': proxy_url
-            }
-        resp = requests.post(
-            uri, headers=headers, data=data, timeout=timeout,
-            **kwargs
-        )
+            kwargs["proxies"] = {"http": proxy_url, "https": proxy_url}
+        resp = requests.post(uri, headers=headers, data=data, timeout=timeout, **kwargs)
         resp.raise_for_status()
         return True
     except requests.exceptions.RequestException as e:
-        print('Error {0!r} sending to Sentry'.format(e), file=sys.stderr)
+        print("Error {0!r} sending to Sentry".format(e), file=sys.stderr)
         return False
 
 
@@ -113,7 +103,7 @@ else:
 class SimpleSentryClient(object):
     TIMEOUT = 5
     SENTRY_VERSION = 5
-    USER_AGENT = 'shentry/{0}'.format(VERSION)
+    USER_AGENT = "shentry/{0}".format(VERSION)
 
     def __init__(self, dsn, uri, public, secret, project_id):
         self.dsn = dsn
@@ -124,9 +114,9 @@ class SimpleSentryClient(object):
 
     @classmethod
     def new_from_environment(cls):
-        dsn = os.environ.pop('SHELL_SENTRY_DSN', '')
+        dsn = os.environ.pop("SHELL_SENTRY_DSN", "")
         if not dsn:
-            dsn = os.environ.pop('SENTRY_DSN', '')
+            dsn = os.environ.pop("SENTRY_DSN", "")
         if not dsn:
             dsn = read_systemwide_config()
         if not dsn:
@@ -134,89 +124,97 @@ class SimpleSentryClient(object):
         else:
             try:
                 dsn_fields = urlparse(dsn)
-                keys, netloc = dsn_fields.netloc.split('@', 1)
-                if ':' in keys:
-                    public, private = keys.split(':', 1)
+                keys, netloc = dsn_fields.netloc.split("@", 1)
+                if ":" in keys:
+                    public, private = keys.split(":", 1)
                 else:
                     public = keys
-                    private = ''
-                project_id = dsn_fields.path.lstrip('/')
-                uri = '{proto}://{netloc}/api/{project_id}/store/'.format(
-                    proto=dsn_fields.scheme, netloc=netloc,
+                    private = ""
+                project_id = dsn_fields.path.lstrip("/")
+                uri = "{proto}://{netloc}/api/{project_id}/store/".format(
+                    proto=dsn_fields.scheme,
+                    netloc=netloc,
                     project_id=project_id,
                 )
                 return cls(dsn, uri, public, private, project_id)
             except Exception as e:
-                print('Error parsing sentry DSN {0}: {1}'.format(dsn, e), file=sys.stderr)
+                print(
+                    "Error parsing sentry DSN {0}: {1}".format(dsn, e), file=sys.stderr
+                )
 
-    def send_event(self, message, level, fingerprint, logger='', culprit=None, extra_context={}):
+    def send_event(
+        self, message, level, fingerprint, logger="", culprit=None, extra_context={}
+    ):
         event_id = uuid.uuid4().hex
         now = int(time.time())
         uname = os.uname()
         event = {
-            'event_id': event_id,
-            'timestamp': datetime.datetime.utcnow().isoformat().split('.', 1)[0],
-            'message': message,
-            'level': level,
-            'server_name': socket.gethostname(),
-            'sdk': {
-                'name': 'shentry',
-                'version': VERSION,
+            "event_id": event_id,
+            "timestamp": datetime.datetime.utcnow().isoformat().split(".", 1)[0],
+            "message": message,
+            "level": level,
+            "server_name": socket.gethostname(),
+            "sdk": {
+                "name": "shentry",
+                "version": VERSION,
             },
-            'fingerprint': fingerprint,
-            'platform': 'other',
-            'device': {
-                'name': uname[0],
-                'version': uname[2],
-                'build': uname[3]
-            },
-            'extra': {}
+            "fingerprint": fingerprint,
+            "platform": "other",
+            "device": {"name": uname[0], "version": uname[2], "build": uname[3]},
+            "extra": {},
         }
         if logger:
-            event['logger'] = logger
+            event["logger"] = logger
         if culprit is not None:
-            event['culprit'] = culprit
-        event['extra'].update(extra_context)
+            event["culprit"] = culprit
+        event["extra"].update(extra_context)
         headers = {
-            'X-Sentry-Auth': (
-                'Sentry sentry_version={self.SENTRY_VERSION}, '
-                'sentry_client={self.USER_AGENT}, '
-                'sentry_timestamp={now}, '
-                'sentry_key={self.public}, '
-                'sentry_secret={self.secret}'
+            "X-Sentry-Auth": (
+                "Sentry sentry_version={self.SENTRY_VERSION}, "
+                "sentry_client={self.USER_AGENT}, "
+                "sentry_timestamp={now}, "
+                "sentry_key={self.public}, "
+                "sentry_secret={self.secret}"
             ).format(now=now, self=self),
-            'User-Agent': self.USER_AGENT,
-            'Content-Type': 'application/json',
+            "User-Agent": self.USER_AGENT,
+            "Content-Type": "application/json",
         }
-        if os.environ.get('SHELL_SENTRY_VERBOSE', '0') == '1':
-            print('Sending to shentry', file=sys.stderr)
+        if os.environ.get("SHELL_SENTRY_VERBOSE", "0") == "1":
+            print("Sending to shentry", file=sys.stderr)
             print(event, file=sys.stderr)
-        data = json.dumps(event).encode('utf-8')
-        return send_to_sentry(uri=self.uri, headers=headers, data=data, timeout=self.TIMEOUT)
+        data = json.dumps(event).encode("utf-8")
+        return send_to_sentry(
+            uri=self.uri, headers=headers, data=data, timeout=self.TIMEOUT
+        )
 
 
 def get_command(argv):
     # get the command
     i_am_shell = False
     command = argv
-    if command[0] == '-c':
+    if command[0] == "-c":
         i_am_shell = True
         command = command[1:]
-    if command[0] == '--':
+    if command[0] == "--":
         command = command[1:]
-    shell = os.environ.get('SHELL', '/bin/sh')
-    if i_am_shell or 'shentry' in shell:
-        shell = '/bin/sh'
-    command_ws = ' '.join(command)
-    full_command = [shell, '-c', command_ws]
+    shell = os.environ.get("SHELL", "/bin/sh")
+    if i_am_shell or "shentry" in shell:
+        shell = "/bin/sh"
+    command_ws = " ".join(command)
+    full_command = [shell, "-c", command_ws]
     return full_command, command_ws, shell
 
 
 def show_usage():
-    print('Usage: shentry [-c] command [...]', file=sys.stderr)
-    print('', file=sys.stderr)
-    print('Runs COMMAND, sending the output to Sentry if it exits non-0', file=sys.stderr)
-    print('Takes sentry DSN from $SHELL_SENTRY_DSN, $SENTRY_DSN, or /etc/shentry_dsn', file=sys.stderr)
+    print("Usage: shentry [-c] command [...]", file=sys.stderr)
+    print("", file=sys.stderr)
+    print(
+        "Runs COMMAND, sending the output to Sentry if it exits non-0", file=sys.stderr
+    )
+    print(
+        "Takes sentry DSN from $SHELL_SENTRY_DSN, $SENTRY_DSN, or /etc/shentry_dsn",
+        file=sys.stderr,
+    )
 
 
 def read_snippet(fo, max_length):
@@ -228,17 +226,17 @@ def read_snippet(fo, max_length):
     if length > max_length:
         top = int(max_length / 2) - 8
         bottom = max_length - top
-        top = fo.read(top).decode('utf-8', 'ignore')
+        top = fo.read(top).decode("utf-8", "ignore")
         rv.append(top)
-        if not top.endswith('\n'):
-            rv.append('\n')
-        rv.append('\n[snip]\n')
+        if not top.endswith("\n"):
+            rv.append("\n")
+        rv.append("\n[snip]\n")
         fo.seek(-1 * bottom, os.SEEK_END)
-        rv.append(fo.read(bottom).decode('utf-8', 'ignore'))
+        rv.append(fo.read(bottom).decode("utf-8", "ignore"))
     else:
-        rv.append(fo.read().decode('utf-8', 'ignore'))
+        rv.append(fo.read().decode("utf-8", "ignore"))
         read_all = True
-    return ''.join(rv), read_all
+    return "".join(rv), read_all
 
 
 def main(argv=None):
@@ -248,20 +246,23 @@ def main(argv=None):
         show_usage()
         return 2
     extra_context = {
-        'PATH': os.environ.get('PATH', ''),
-        'username': pwd.getpwuid(os.getuid()).pw_name
+        "PATH": os.environ.get("PATH", ""),
+        "username": pwd.getpwuid(os.getuid()).pw_name,
     }
-    if 'TZ' in os.environ:
-        extra_context['TZ'] = os.environ['TZ']
+    if "TZ" in os.environ:
+        extra_context["TZ"] = os.environ["TZ"]
     client = SimpleSentryClient.new_from_environment()
     full_command, command_ws, shell = get_command(argv[1:])
-    extra_context['command'] = command_ws
-    extra_context['shell'] = shell
+    extra_context["command"] = command_ws
+    extra_context["shell"] = shell
     # if we couldn't configure sentry, just pass through
     if client is None:
         signal.signal(signal.SIGPIPE, signal.SIG_DFL)
         os.execv(shell, full_command)
-        print('Unable to execv({0}, {1})'.format(shell, repr(full_command)), file=sys.stderr)
+        print(
+            "Unable to execv({0}, {1})".format(shell, repr(full_command)),
+            file=sys.stderr,
+        )
         return 1
     working_dir = None
 
@@ -271,7 +272,7 @@ def main(argv=None):
         if p is not None:
             p.send_signal(signum)
         else:
-            raise ValueError('received signal %d without a child; bailing' % signum)
+            raise ValueError("received signal %d without a child; bailing" % signum)
 
     def reset_signals():
         for sig in (signal.SIGTERM, signal.SIGQUIT, signal.SIGINT, signal.SIGPIPE):
@@ -281,38 +282,49 @@ def main(argv=None):
         signal.signal(sig, passthrough)
     try:
         working_dir = tempfile.mkdtemp()
-        with open(os.path.join(working_dir, 'stdout'), 'w+b') as stdout:
-            with open(os.path.join(working_dir, 'stderr'), 'w+b') as stderr:
+        with open(os.path.join(working_dir, "stdout"), "w+b") as stdout:
+            with open(os.path.join(working_dir, "stderr"), "w+b") as stderr:
                 start_time = time.time()
-                p = subprocess.Popen(full_command, stdout=stdout, stderr=stderr, shell=False,
-                                     preexec_fn=reset_signals)
-                extra_context['start_time'] = start_time
-                extra_context['load_average_at_exit'] = ' '.join(map(str, os.getloadavg()))
-                extra_context['working_directory'] = os.getcwd()
-                extra_context['_sent_with'] = send_to_sentry.__name__
+                p = subprocess.Popen(
+                    full_command,
+                    stdout=stdout,
+                    stderr=stderr,
+                    shell=False,
+                    preexec_fn=reset_signals,
+                )
+                extra_context["start_time"] = start_time
+                extra_context["load_average_at_exit"] = " ".join(
+                    map(str, os.getloadavg())
+                )
+                extra_context["working_directory"] = os.getcwd()
+                extra_context["_sent_with"] = send_to_sentry.__name__
                 if p.wait() != 0:
                     end_time = time.time()
-                    extra_context['duration'] = end_time - start_time
+                    extra_context["duration"] = end_time - start_time
                     code = p.returncode
-                    extra_context['returncode'] = code
+                    extra_context["returncode"] = code
                     stderr_head, stderr_is_all = read_snippet(stderr, 700)
-                    message = 'Command `{0}` failed with code {1}.\n'.format(command_ws, code)
+                    message = "Command `{0}` failed with code {1}.\n".format(
+                        command_ws, code
+                    )
                     if stderr_head:
                         if stderr_is_all:
-                            message += '\nstderr:\n'
+                            message += "\nstderr:\n"
                         else:
-                            message += '\nExcerpt of stderr:\n'
+                            message += "\nExcerpt of stderr:\n"
                         message += stderr_head
-                    stdout_head, stdout_is_all = read_snippet(stdout, 200 + (700 - len(stderr_head)))
+                    stdout_head, stdout_is_all = read_snippet(
+                        stdout, 200 + (700 - len(stderr_head))
+                    )
                     if stdout_head:
                         if stdout_is_all:
-                            message += '\nstdout:\n'
+                            message += "\nstdout:\n"
                         else:
-                            message += '\nExcerpt of stdout:\n'
+                            message += "\nExcerpt of stdout:\n"
                         message += stdout_head
                     client.send_event(
                         message=message,
-                        level='error',
+                        level="error",
                         fingerprint=[socket.gethostname(), command_ws],
                         extra_context=extra_context,
                     )
@@ -321,5 +333,5 @@ def main(argv=None):
             shutil.rmtree(working_dir)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

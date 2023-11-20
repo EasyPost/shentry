@@ -13,12 +13,11 @@ setup(
     scripts=["shentry.py"],
     keywords=["logging"],
     description="Wrap a program in sentry!",
-    python_requires=">=3.6, <4",
+    python_requires=">=3.7, <4",
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Environment :: Console",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",

@@ -2,8 +2,8 @@
 
 ## v1.0.0 (2023-11-20)
 
-- Drops support for Python earlier than 3.6
-- Adds support for Python 3.9-3.12
+- Drops support for Python earlier than 3.7
+- Adds support for Python 3.10-3.12
 
 ## v0.4.0
 

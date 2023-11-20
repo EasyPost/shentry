@@ -1,7 +1,4 @@
-# pytest can't go above 3.2 because we need python 2.6 compat
-pytest==3.2.*
-# pytest 2.6 also breaks python 2.6 compatibility
-pytest-cov==2.5.*
-mock==2.0.0
-pytest-mock==1.*
-flake8==3.*
+flake8==5.*  # TODO: flake8 v6 requires Python 3.8.1+
+pytest-cov==4.*
+pytest-mock==3.*
+pytest==7.*

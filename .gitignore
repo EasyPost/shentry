@@ -8,3 +8,5 @@ test-*.xml
 venv/
 env/
 .coverage
+__pycache__
+*.lcov

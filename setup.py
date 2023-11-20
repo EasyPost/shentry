@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name="shentry",
-    version="0.4.0",
+    version="1.0.0",
     author="EasyPost",
     author_email="oss@easypost.com",
     url="https://github.com/easypost/shentry",
@@ -13,14 +13,11 @@ setup(
     scripts=["shentry.py"],
     keywords=["logging"],
     description="Wrap a program in sentry!",
-    python_requires=">=2.6, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, <4",
+    python_requires=">=3.6, <4",
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Environment :: Console",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 2.6",
-        "Programming Language :: Python :: 2.7",
-        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",

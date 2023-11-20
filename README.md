@@ -1,6 +1,8 @@
 # Shentry
 
 [![Build Status](https://travis-ci.com/EasyPost/shentry.svg?branch=master)](https://travis-ci.com/EasyPost/shentry)
+[![Coverage Status](https://coveralls.io/repos/github/EasyPost/shentry/badge.svg)](https://coveralls.io/github/EasyPost/shentry)
+[![Version](https://img.shields.io/github/v/tag/EasyPost/shentry)](https://github.com/EasyPost/shentry/releases)
 
 **Shentry** is a single-file Python script which will run the wrapped
 command and, if it fails, post an event to Sentry. By default, if the

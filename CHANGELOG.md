@@ -1,9 +1,10 @@
 # CHANGELOG
 
-## v1.0.0 (2023-11-20)
+## v1.0.0 FUTURE
 
 - Drops support for Python earlier than 3.7
 - Adds support for Python 3.10-3.12
+- Overhauls dev tooling
 
 ## v0.4.0
 

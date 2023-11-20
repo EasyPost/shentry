@@ -1,6 +1,4 @@
-build==0.10.*
 flake8==5.*  # TODO: flake8 v6 requires Python 3.8.1+
 pytest-cov==4.*
 pytest-mock==3.*
 pytest==7.*
-twine==4.*

@@ -8,10 +8,6 @@ TEST_DIR := tests
 help:
 	@cat Makefile | grep '^## ' --color=never | cut -c4- | sed -e "`printf 's/ - /\t- /;'`" | column -s "`printf '\t'`" -t
 
-## build - Builds the project in preparation for release
-build:
-	$(VIRTUAL_BIN)/python -m build
-
 ## clean - Clean the project
 clean:
 	rm -rf $(VIRTUAL_ENV) dist/ *.egg-info/ .*cache htmlcov *.lcov .coverage
@@ -37,13 +33,8 @@ lint: flake8
 publish:
 	$(VIRTUAL_BIN)/twine upload dist/*
 
-## release - Cuts a release for the project on GitHub (requires GitHub CLI)
-# tag = The associated tag title of the release
-release:
-	gh release create ${tag} dist/*
-
 ## test - Test the project
 test:
 	$(VIRTUAL_BIN)/pytest
 
-.PHONY: help build clean coverage flake8 install lint publish release test
+.PHONY: help clean coverage flake8 install lint publish test

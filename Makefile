@@ -29,12 +29,8 @@ install:
 ## lint - Run linters on the project
 lint: flake8
 
-## publish - Publish the project to PyPI
-publish:
-	$(VIRTUAL_BIN)/twine upload dist/*
-
 ## test - Test the project
 test:
 	$(VIRTUAL_BIN)/pytest
 
-.PHONY: help clean coverage flake8 install lint publish test
+.PHONY: help clean coverage flake8 install lint test

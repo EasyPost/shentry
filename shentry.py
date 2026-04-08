@@ -43,7 +43,7 @@ import time
 import uuid
 from contextlib import closing
 
-VERSION = "1.0.0"
+VERSION = "2.0.0"
 
 
 def read_systemwide_config():

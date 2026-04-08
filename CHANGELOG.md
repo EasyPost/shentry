@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v2.0.0 (2026-04-08)
+
+- Drops support for Python earlier than 3.9
+- Adds support for Python 3.13 and 3.14
+- Migrates from Coveralls to Codecov
+
 ## v1.0.0 (2023-11-20)
 
 - Drops support for Python earlier than 3.7

@@ -1,6 +1,6 @@
 # Shentry
 
-[![Build Status](https://travis-ci.com/EasyPost/shentry.svg?branch=master)](https://travis-ci.com/EasyPost/shentry)
+[![CI](https://github.com/EasyPost/shentry/workflows/CI/badge.svg)](https://github.com/EasyPost/shentry/actions?query=workflow%3ACI)
 [![codecov](https://codecov.io/gh/EasyPost/shentry/graph/badge.svg?token=0iI00RC1q8)](https://codecov.io/gh/EasyPost/shentry)
 [![Version](https://img.shields.io/github/v/tag/EasyPost/shentry)](https://github.com/EasyPost/shentry/releases)
 

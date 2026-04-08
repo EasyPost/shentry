@@ -4,7 +4,11 @@
 
 - Drops support for Python earlier than 3.9
 - Adds support for Python 3.13 and 3.14
+- Swaps setup.py for pyproject.toml
+- Swaps Makefile for Justfile
+- Swaps pip for uv
 - Migrates from Coveralls to Codecov
+- Updates dev dependencies
 
 ## v1.0.0 (2023-11-20)
 

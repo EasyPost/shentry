@@ -1,7 +1,7 @@
 # Shentry
 
 [![Build Status](https://travis-ci.com/EasyPost/shentry.svg?branch=master)](https://travis-ci.com/EasyPost/shentry)
-[![Coverage Status](https://coveralls.io/repos/github/EasyPost/shentry/badge.svg)](https://coveralls.io/github/EasyPost/shentry)
+[![codecov](https://codecov.io/gh/EasyPost/shentry/graph/badge.svg?token=0iI00RC1q8)](https://codecov.io/gh/EasyPost/shentry)
 [![Version](https://img.shields.io/github/v/tag/EasyPost/shentry)](https://github.com/EasyPost/shentry/releases)
 
 **Shentry** is a single-file Python script which will run the wrapped
@@ -21,7 +21,7 @@ If the `requests` library is available, it will be used; otherwise, the standard
 either `$SHELL_SENTRY_PROXY` or the contents of `/etc/shentry_proxy` can be
 used to configure an outbound proxy.
 
-The `setup.py` in this directory only exists for this project's dev tooling. To get
+The `pyproject.toml` in this directory only exists for this project's dev tooling. To get
 Shentry working on your machine, simply copy `shentry.py` wherever you need it.
 
 ## Usage

@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "shentry"
+description = "Wrap a program in sentry!"
+version = "2.0.0"
+readme = "README.md"
+requires-python = ">=3.9, <4"
+license = { file = "LICENSE.txt" }
+authors = [{ name = "EasyPost", email = "oss@easypost.com" }]
+keywords = ["logging"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Operating System :: POSIX",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: ISC License (ISCL)",
+]
+optional-dependencies = { dev = [
+    "flake8 == 6.*",
+    "pytest == 8.*",
+    "pytest-cov == 7.*",
+    "pytest-mock == 3.*",
+] }
+
+[project.urls]
+Source = "https://github.com/easypost/shentry"
+Tracker = "https://github.com/easypost/shentry/issues"
+
+[project.scripts]
+shentry = "shentry:main"
+
+[tool.setuptools]
+py-modules = ["shentry"]

@@ -4,38 +4,40 @@ on:
   push:
     branches: [master]
   pull_request:
+  workflow_dispatch:
 
 jobs:
   flake8:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: set up python
-        uses: actions/setup-python@v4
+      - uses: actions/checkout@v6
+      - uses: extractions/setup-just@v3
+      - uses: astral-sh/setup-uv@v7
+      - uses: actions/setup-python@v6
         with:
-          python-version: '3.12'
+          python-version: '3.14'
       - name: install dependencies
-        run: make install
+        run: just install
       - name: lint with flake8
-        run: make lint
+        run: just lint
   run-tests:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        pythonversion: ['3.7', '3.8', '3.9', '3.10', '3.11', '3.12']
+        pythonversion: ['3.9', '3.10', '3.11', '3.12', '3.13', '3.14']
     steps:
-      - uses: actions/checkout@v3
-      - name: set up python
-        uses: actions/setup-python@v4
+      - uses: actions/checkout@v6
+      - uses: extractions/setup-just@v3
+      - uses: astral-sh/setup-uv@v7
+      - uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.pythonversion }}
       - name: install dependencies
-        run: make install
+        run: just install
       - name: test with pytest
-        run: make coverage
-      - name: Coveralls
+        run: just coverage
+      - name: Coverage
         if: github.ref == 'refs/heads/master'
-        uses: coverallsapp/github-action@master
+        uses: codecov/codecov-action@v5
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          path-to-lcov: './coverage.lcov'
+          token: ${{ secrets.CODECOV_TOKEN }}

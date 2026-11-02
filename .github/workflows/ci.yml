@@ -21,7 +21,8 @@ jobs:
       - name: lint with flake8
         run: just lint
   run-tests:
-    runs-on: ubuntu-latest
+    # TODO: Ubuntu 26 will require modernizing all dependencies because it drops python 3.9.
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         pythonversion: ['3.9', '3.10', '3.11', '3.12', '3.13', '3.14']
